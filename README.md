@@ -1,89 +1,100 @@
-# Mind Map Canvas — Obsidian 思维导图画布插件
+# Mind Map Canvas
 
-在 Obsidian 中创建、编辑思维导图。提供可无限缩放、可自由拖拽的画布，数据以 Markdown 嵌套列表形式存储，与笔记生态无缝衔接。
+Create and edit mind maps in Obsidian on a zoomable, draggable infinite canvas. Mind maps are stored as nested Markdown lists, so your data stays plain text and works seamlessly with the rest of your notes.
 
-## 功能特性
+## Features
 
-- **思维导图画布**：根节点居中、一级分支左右对称展开的树形布局
-- **无限画布**：滚轮缩放、拖拽平移、一键自适应视图
-- **节点编辑**：双击 / F2 编辑文字，Tab 添加子主题，Enter 添加同级主题，Delete 删除
-- **自由拖拽**：节点可拖拽到任意位置，连线实时跟随
-- **数据持久化**：以 Markdown 嵌套列表（`- ` + tab 缩进）保存，可直接在编辑器查看/修改结构
-- **双向联动**：打开任意 Markdown 笔记，将其嵌套列表渲染为思维导图
+- **Mind map layout**: Root node centered, with first-level branches expanding symmetrically to the left and right
+- **Infinite canvas**: Scroll to zoom, drag to pan, one-click fit-to-view
+- **Node editing**: Double-click or `F2` to edit text, `Tab` to add a subtopic, `Enter` to add a sibling topic, `Delete` to remove
+- **Free dragging**: Drag any node to an arbitrary position, with connectors following in real time
+- **Plain-text persistence**: Saved as nested Markdown lists (`- ` with tab indentation), viewable and editable directly in the editor
+- **Two-way sync**: Open any Markdown note and render its nested lists as a mind map
 
-## 安装与构建
+## Installation and build
 
 ```bash
 npm install
-npm run build       # 生产构建，生成 main.js
-npm run dev         # 开发模式，监听文件变化
-npm run typecheck   # 仅类型检查
+npm run build       # production build, outputs main.js
+npm run dev         # development mode, watches for file changes
+npm run typecheck   # type check only
 ```
 
-构建产物为 `main.js`，与 `manifest.json`、`styles.css` 一起放入测试库的插件目录：
+The build output is `main.js`. Put it together with `manifest.json` and `styles.css` into your vault's plugin folder:
 
 ```
-<你的库>/.obsidian/plugins/mindmap-canvas/
+<your-vault>/.obsidian/plugins/mindmap-canvas/
 ├── main.js
 ├── manifest.json
 └── styles.css
 ```
 
-然后在 Obsidian 设置 → 第三方插件中启用「Mind Map Canvas」。
+Then enable **Mind Map Canvas** in Obsidian → Settings → Community plugins.
 
-## 使用方式
+Requires Obsidian **1.7.2** or later.
 
-- 点击左侧功能区图标，或执行命令面板（Ctrl/Cmd+P）中的「打开思维导图」/「新建思维导图」
-- 工具栏按钮依次为：新建、打开当前笔记、添加子主题、添加同级主题、删除、放大、缩小、自适应、重置布局
+## Usage
 
-## 快捷键
+- Click the ribbon icon, or run **Open mind map** / **New mind map** from the command palette (`Ctrl/Cmd+P`)
+- Toolbar buttons, in order: New, Open current note, Add subtopic, Add sibling topic, Delete, Zoom in, Zoom out, Fit view, Reset layout
 
-| 快捷键 | 操作 |
+## Keyboard shortcuts
+
+| Shortcut | Action |
 | --- | --- |
-| `Tab` | 添加子主题 |
-| `Enter` | 添加同级主题 |
-| `Delete` / `Backspace` | 删除选中节点 |
-| `F2` / 双击 | 编辑节点文字 |
-| 滚轮 | 缩放 |
-| 拖拽空白 | 平移画布 |
-| 拖拽节点 | 移动节点 |
+| `Tab` | Add subtopic |
+| `Enter` | Add sibling topic |
+| `Delete` / `Backspace` | Delete selected node |
+| `F2` / double-click | Edit node text |
+| Scroll | Zoom |
+| Drag empty area | Pan canvas |
+| Drag node | Move node |
 
-## 数据结构
+## Data format
 
-思维导图以 Markdown 嵌套列表存储，例如：
+Mind maps are stored as nested Markdown lists, for example:
 
 ```markdown
-- 中心主题
-	- 分支一
-		- 子主题 A
-		- 子主题 B
-	- 分支二
+- Central topic
+	- Branch one
+		- Subtopic A
+		- Subtopic B
+	- Branch two
 ```
 
-## 技术栈
+## Tech stack
 
-- TypeScript + esbuild 打包
-- Obsidian Plugin API（`ItemView`、`registerView`）
-- 原生 DOM + SVG 渲染（无第三方运行时依赖）
+- TypeScript, bundled with esbuild
+- Obsidian Plugin API (`ItemView`, `registerView`)
+- Native DOM + SVG rendering (no third-party runtime dependencies)
 
-## 项目结构
+## Project structure
 
 ```
 mindmap-canvas/
-├── manifest.json          # 插件元数据
+├── manifest.json          # plugin metadata
 ├── package.json
 ├── tsconfig.json
-├── esbuild.config.mjs     # 构建配置
+├── esbuild.config.mjs     # build config
 ├── versions.json
-├── styles.css             # 样式
+├── styles.css             # styles
 └── src/
-    ├── main.ts            # 插件入口
-    ├── view.ts            # 思维导图视图（ItemView）
-    ├── renderer.ts        # 画布渲染与交互
-    ├── layout.ts          # 树形布局算法
-    ├── model.ts           # Markdown 解析/序列化
-    └── types.ts           # 类型定义
+    ├── main.ts            # plugin entry point
+    ├── view.ts            # mind map view (ItemView)
+    ├── renderer.ts        # canvas rendering and interaction
+    ├── layout.ts          # tree layout algorithm
+    ├── model.ts           # Markdown parsing / serialization
+    └── types.ts           # type definitions
 ```
+
+## 中文说明
+
+在 Obsidian 中创建、编辑思维导图的画布插件。数据以 Markdown 嵌套列表（`- ` + tab 缩进）保存，可在编辑器中直接查看和修改，并提供滚轮缩放、拖拽平移、一键自适应等无限画布能力。
+
+- 用法：点击左侧功能区图标，或执行命令面板中的「打开思维导图」/「新建思维导图」
+- 快捷键：`Tab` 添加子主题，`Enter` 添加同级主题，`Delete` 删除节点，`F2`/双击 编辑文字
+- 构建：`npm install` 后执行 `npm run build`，将产物放入 `<库>/.obsidian/plugins/mindmap-canvas/`
+- 要求 Obsidian 1.7.2 及以上
 
 ## License
 

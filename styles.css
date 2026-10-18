@@ -156,6 +156,20 @@
   cursor: text;
 }
 
+/* 删除确认弹窗按钮行 */
+.mm-confirm-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.mm-confirm-row button {
+  padding: 5px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 /* 节点编辑输入框 */
 .mm-node-input {
   border: none;

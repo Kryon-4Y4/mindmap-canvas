@@ -1,5 +1,5 @@
 // 思维导图视图：ItemView，负责工具栏、文件读写与数据变更
-import { ItemView, WorkspaceLeaf, TFile, Notice, setIcon } from "obsidian";
+import { App, ItemView, Modal, TFile, Notice, setIcon } from "obsidian";
 import { MindMapRenderer } from "./renderer";
 import {
   MindNode,
@@ -74,7 +74,7 @@ export class MindMapView extends ItemView {
       if (root.children.length === 0 && root.text.trim() === "") {
         root = createDefaultTree();
       }
-    } catch (e) {
+    } catch {
       root = createDefaultTree();
     }
     this.renderer.setRoot(root);
@@ -164,20 +164,22 @@ export class MindMapView extends ItemView {
     const parentInfo = findParent(root, id);
     if (!parentInfo) return;
     const node = findNode(root, id);
-    const count = node ? countNodes(node) : 0;
+    // countNodes 包含节点自身，子主题数量需减 1
+    const childCount = node ? countNodes(node) - 1 : 0;
     const confirmMsg =
-      count > 0 ? `删除「${node?.text ?? ""}」及其 ${count} 个子主题？` : `删除「${node?.text ?? ""}」？`;
+      childCount > 0
+        ? `删除「${node?.text ?? ""}」及其 ${childCount} 个子主题？`
+        : `删除「${node?.text ?? ""}」？`;
 
-    // 使用 Obsidian 原生确认框风格（这里用简单确认，避免误删）
-    const ok = window.confirm(confirmMsg);
-    if (!ok) return;
-
-    this.mutate((r) => {
-      const info = findParent(r, id);
-      if (!info) return;
-      info.parent.children.splice(info.index, 1);
-    });
-    this.renderer.select(null);
+    new ConfirmModal(this.app, confirmMsg, (confirmed) => {
+      if (!confirmed) return;
+      this.mutate((r) => {
+        const info = findParent(r, id);
+        if (!info) return;
+        info.parent.children.splice(info.index, 1);
+      });
+      this.renderer.select(null);
+    }).open();
   }
 
   // ---------------------------------------------------------------------------
@@ -214,7 +216,7 @@ export class MindMapView extends ItemView {
       if (root) this.renderer.setRoot(root);
     });
 
-    const spacer = toolbar.createDiv({ cls: "mm-toolbar-spacer" });
+    toolbar.createDiv({ cls: "mm-toolbar-spacer" });
     this.statusEl = toolbar.createDiv({ cls: "mm-status" });
   }
 
@@ -272,6 +274,40 @@ export class MindMapView extends ItemView {
       return;
     }
     await this.loadFile(file);
+  }
+}
+
+/** 使用 Obsidian 原生 Modal 风格的确认框，替代 window.confirm */
+class ConfirmModal extends Modal {
+  constructor(
+    app: App,
+    private message: string,
+    private onResult: (confirmed: boolean) => void
+  ) {
+    super(app);
+  }
+
+  onOpen(): void {
+    this.contentEl.createEl("p", { text: this.message });
+    const row = this.contentEl.createDiv({ cls: "mm-confirm-row" });
+
+    const confirmBtn = row.createEl("button", {
+      text: "删除",
+      cls: "mod-warning",
+    });
+    confirmBtn.addEventListener("click", () => this.finish(true));
+
+    const cancelBtn = row.createEl("button", { text: "取消" });
+    cancelBtn.addEventListener("click", () => this.finish(false));
+  }
+
+  onClose(): void {
+    this.contentEl.empty();
+  }
+
+  private finish(result: boolean): void {
+    this.onResult(result);
+    this.close();
   }
 }
 

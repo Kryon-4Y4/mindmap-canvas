@@ -65,23 +65,17 @@ export class MindMapRenderer {
     this.container.tabIndex = 0;
 
     // 内容层（受缩放/平移 transform 影响）
-    this.contentEl = document.createElement("div");
-    this.contentEl.className = "mm-content";
-    this.container.appendChild(this.contentEl);
+    this.contentEl = this.container.createDiv({ cls: "mm-content" });
 
     // 连线层（SVG）
-    this.svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    this.svgEl.classList.add("mm-edges");
+    this.svgEl = this.contentEl.createSvg("svg", { cls: "mm-edges" });
     this.svgEl.style.left = `${-SVG_HALF}px`;
     this.svgEl.style.top = `${-SVG_HALF}px`;
     this.svgEl.style.width = `${SVG_SIZE}px`;
     this.svgEl.style.height = `${SVG_SIZE}px`;
-    this.contentEl.appendChild(this.svgEl);
 
     // 节点层
-    this.nodeLayerEl = document.createElement("div");
-    this.nodeLayerEl.className = "mm-nodes";
-    this.contentEl.appendChild(this.nodeLayerEl);
+    this.nodeLayerEl = this.contentEl.createDiv({ cls: "mm-nodes" });
 
     // 初始空树
     this.root = { id: "0", text: "中心主题", children: [] };
@@ -195,7 +189,6 @@ export class MindMapRenderer {
     // 1. 渲染节点
     for (const [id, layout] of this.layout.nodes) {
       const el = this.createNodeEl(id, layout);
-      this.nodeLayerEl.appendChild(el);
       this.nodeEls.set(id, el);
     }
 
@@ -217,8 +210,7 @@ export class MindMapRenderer {
 
   private createNodeEl(id: string, layout: NodeLayout): HTMLElement {
     const node = this.findNode(this.root, id);
-    const el = document.createElement("div");
-    el.className = "mm-node";
+    const el = this.nodeLayerEl.createDiv({ cls: "mm-node" });
     if (id === this.root.id) el.classList.add("mm-node-root");
     el.dataset.nodeId = id;
     el.textContent = node ? node.text : "";
@@ -238,17 +230,14 @@ export class MindMapRenderer {
 
   private renderEdges(): void {
     // 遍历所有节点，为其子节点画连线
-    const seen = new Set<string>();
-    for (const [id, layout] of this.layout.nodes) {
+    for (const [id] of this.layout.nodes) {
       const node = this.findNode(this.root, id);
       if (!node) continue;
       const parentLayout = this.layout.nodes.get(id)!;
       for (const child of node.children) {
         const childLayout = this.layout.nodes.get(child.id);
         if (!childLayout) continue;
-        const path = this.createEdgePath(parentLayout, childLayout);
-        this.svgEl.appendChild(path);
-        seen.add(child.id);
+        this.createEdgePath(parentLayout, childLayout);
       }
     }
   }
@@ -276,9 +265,8 @@ export class MindMapRenderer {
       y1 + SVG_HALF
     }, ${cx2 + SVG_HALF} ${y2 + SVG_HALF}, ${x2 + SVG_HALF} ${y2 + SVG_HALF}`;
 
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    const path = this.svgEl.createSvg("path", { cls: "mm-edge" });
     path.setAttribute("d", d);
-    path.classList.add("mm-edge");
     return path;
   }
 
@@ -297,24 +285,24 @@ export class MindMapRenderer {
   // ---------------------------------------------------------------------------
 
   private bindEvents(): void {
-    this.onCanvasPointerDown = this.onCanvasPointerDown.bind(this);
-    this.onPointerMove = this.onPointerMove.bind(this);
-    this.onPointerUp = this.onPointerUp.bind(this);
-    this.onWheel = this.onWheel.bind(this);
-    this.onKeyDown = this.onKeyDown.bind(this);
+    const onCanvasPointerDown = (e: PointerEvent) => this.onCanvasPointerDown(e);
+    const onPointerMove = (e: PointerEvent) => this.onPointerMove(e);
+    const onPointerUp = (e: PointerEvent) => this.onPointerUp(e);
+    const onWheel = (e: WheelEvent) => this.onWheel(e);
+    const onKeyDown = (e: KeyboardEvent) => this.onKeyDown(e);
 
-    this.container.addEventListener("pointerdown", this.onCanvasPointerDown);
-    window.addEventListener("pointermove", this.onPointerMove);
-    window.addEventListener("pointerup", this.onPointerUp);
-    this.container.addEventListener("wheel", this.onWheel, { passive: false });
-    this.container.addEventListener("keydown", this.onKeyDown);
+    this.container.addEventListener("pointerdown", onCanvasPointerDown);
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    this.container.addEventListener("wheel", onWheel, { passive: false });
+    this.container.addEventListener("keydown", onKeyDown);
 
     this.disposers.push(() => {
-      this.container.removeEventListener("pointerdown", this.onCanvasPointerDown);
-      window.removeEventListener("pointermove", this.onPointerMove);
-      window.removeEventListener("pointerup", this.onPointerUp);
-      this.container.removeEventListener("wheel", this.onWheel);
-      this.container.removeEventListener("keydown", this.onKeyDown);
+      this.container.removeEventListener("pointerdown", onCanvasPointerDown);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      this.container.removeEventListener("wheel", onWheel);
+      this.container.removeEventListener("keydown", onKeyDown);
     });
   }
 
@@ -444,11 +432,11 @@ export class MindMapRenderer {
     el.empty();
     el.classList.add("mm-node-editing");
 
-    const input = document.createElement("input");
-    input.type = "text";
-    input.className = "mm-node-input";
-    input.value = node.text;
-    el.appendChild(input);
+    const input = el.createEl("input", {
+      type: "text",
+      cls: "mm-node-input",
+      value: node.text,
+    });
     input.focus();
     input.select();
 
