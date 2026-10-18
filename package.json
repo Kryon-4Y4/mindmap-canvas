@@ -1,0 +1,27 @@
+{
+  "name": "mindmap-canvas",
+  "version": "1.0.0",
+  "description": "在 Obsidian 中创建和编辑思维导图的可缩放画布插件",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "typecheck": "tsc -noEmit -skipLibCheck",
+    "test": "esbuild test/smoke.ts --bundle --format=cjs --platform=node --outfile=test/smoke.js && node test/smoke.js"
+  },
+  "keywords": [
+    "obsidian",
+    "mindmap",
+    "思维导图"
+  ],
+  "author": "WorkBuddy",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.20.0",
+    "obsidian": "^1.5.7",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.0"
+  }
+}
