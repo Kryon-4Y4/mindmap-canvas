@@ -287,7 +287,7 @@ export class MindMapRenderer {
   private bindEvents(): void {
     const onCanvasPointerDown = (e: PointerEvent) => this.onCanvasPointerDown(e);
     const onPointerMove = (e: PointerEvent) => this.onPointerMove(e);
-    const onPointerUp = (e: PointerEvent) => this.onPointerUp(e);
+    const onPointerUp = () => this.onPointerUp();
     const onWheel = (e: WheelEvent) => this.onWheel(e);
     const onKeyDown = (e: KeyboardEvent) => this.onKeyDown(e);
 
@@ -379,7 +379,7 @@ export class MindMapRenderer {
     }
   }
 
-  private onPointerUp(e: PointerEvent): void {
+  private onPointerUp(): void {
     if (!this.drag) return;
     this.drag = null;
   }

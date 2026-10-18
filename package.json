@@ -1,13 +1,14 @@
 {
   "name": "mindmap-canvas",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A zoomable canvas plugin for creating and editing mind maps, stored as nested Markdown lists",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
     "typecheck": "tsc -noEmit -skipLibCheck",
-    "test": "esbuild test/smoke.ts --bundle --format=cjs --platform=node --outfile=test/smoke.js && node test/smoke.js"
+    "test": "esbuild test/smoke.ts --bundle --format=cjs --platform=node --outfile=test/smoke.js && node test/smoke.js",
+    "lint": "eslint src manifest.json"
   },
   "keywords": [
     "obsidian",
@@ -18,7 +19,11 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
     "esbuild": "^0.20.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-obsidianmd": "^0.4.2",
     "obsidian": "^1.5.7",
     "tslib": "^2.6.2",
     "typescript": "^5.4.0"
